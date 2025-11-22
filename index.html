@@ -1,0 +1,1731 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RAFE Dashboard - Expert Workouts</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        --bg-primary: #0b1d1d;
+        --bg-secondary: #123a3d;
+        --bg-card: #15555a;
+        --accent: #26c6da;
+        --accent-hover: #1f9aa8;
+        --text-primary: #e0f7fa;
+        --text-secondary: #b0bec5;
+        --border: #388ac4;
+        --error: #ef5350;
+        --success: #4caf50;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        line-height: 1.6;
+      }
+
+      /* Login Screen */
+      .login-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .login-box {
+        background: var(--bg-secondary);
+        border: 2px solid var(--accent);
+        border-radius: 16px;
+        padding: 40px;
+        max-width: 400px;
+        width: 100%;
+        box-shadow: 0 8px 32px rgba(38, 198, 218, 0.3);
+      }
+
+      .login-title {
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--accent);
+        text-align: center;
+        margin-bottom: 10px;
+      }
+
+      .login-subtitle {
+        font-size: 14px;
+        color: var(--text-secondary);
+        text-align: center;
+        margin-bottom: 30px;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      .form-label {
+        display: block;
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 8px;
+      }
+
+      .form-input {
+        width: 100%;
+        background: #0f1e2e;
+        border: 2px solid var(--border);
+        border-radius: 10px;
+        padding: 12px 14px;
+        font-size: 15px;
+        color: #ffffff;
+        font-weight: 500;
+        transition: all 0.3s ease;
+      }
+
+      .form-input:focus {
+        outline: none;
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(38, 198, 218, 0.2);
+      }
+
+      .form-input.error {
+        border-color: var(--error);
+        background-color: #2a1515;
+      }
+
+      .error-message {
+        font-size: 13px;
+        color: var(--error);
+        margin-top: 6px;
+        font-weight: 500;
+      }
+
+      .btn {
+        width: 100%;
+        background: var(--accent);
+        border: none;
+        border-radius: 10px;
+        padding: 14px;
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--bg-primary);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 8px rgba(38, 198, 218, 0.4);
+      }
+
+      .btn:hover {
+        background: var(--accent-hover);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(38, 198, 218, 0.5);
+      }
+
+      .btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      /* Main Dashboard */
+      .dashboard {
+        display: none;
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .dashboard.active {
+        display: block;
+      }
+
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: var(--bg-secondary);
+        border: 1px solid rgba(38, 198, 218, 0.3);
+        border-radius: 16px;
+        padding: 16px 20px;
+        margin-bottom: 30px;
+        box-shadow: 0 6px 12px rgba(38, 198, 218, 0.35);
+      }
+
+      .header-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--accent);
+      }
+
+      .header-user {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+      }
+
+      .user-email {
+        font-size: 14px;
+        color: var(--text-secondary);
+      }
+
+      .btn-logout {
+        background: transparent;
+        border: 2px solid var(--accent);
+        color: var(--accent);
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .btn-logout:hover {
+        background: var(--accent);
+        color: var(--bg-primary);
+      }
+
+      .tabs {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 30px;
+        background: var(--bg-secondary);
+        border-radius: 12px;
+        padding: 6px;
+        border: 1px solid rgba(38, 198, 218, 0.3);
+      }
+
+      .tab {
+        flex: 1;
+        padding: 12px;
+        border-radius: 10px;
+        background: transparent;
+        border: none;
+        font-size: 16px;
+        font-weight: 600;
+        color: #a7d7d7;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .tab.active {
+        background: var(--accent);
+        color: var(--bg-primary);
+      }
+
+      .tab-content {
+        display: none;
+      }
+
+      .tab-content.active {
+        display: block;
+      }
+
+      /* Workout Form */
+      .workout-form {
+        background: var(--bg-secondary);
+        border: 1px solid rgba(38, 198, 218, 0.3);
+        border-radius: 16px;
+        padding: 30px;
+        max-width: 900px;
+        margin: 0 auto;
+      }
+
+      .section {
+        margin-bottom: 30px;
+      }
+
+      .section-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--accent);
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        margin-bottom: 20px;
+      }
+
+      @media (max-width: 768px) {
+        .form-row {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      textarea.form-input {
+        resize: vertical;
+        min-height: 100px;
+      }
+
+      /* Day Selector */
+      .days-selector {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+
+      .day-btn {
+        padding: 10px 20px;
+        border: 2px solid var(--border);
+        border-radius: 10px;
+        background: rgba(38, 198, 218, 0.1);
+        color: var(--border);
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .day-btn.active {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: var(--bg-primary);
+      }
+
+      /* Muscle Groups & Exercises */
+      .muscle-groups-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+
+      .muscle-btn {
+        padding: 12px 8px;
+        border: 2px solid var(--border);
+        border-radius: 10px;
+        background: rgba(38, 198, 218, 0.1);
+        color: var(--border);
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-align: center;
+      }
+
+      .muscle-btn.active {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: var(--bg-primary);
+      }
+
+      .exercises-section {
+        background: var(--bg-card);
+        border: 1px solid rgba(38, 198, 218, 0.3);
+        border-radius: 12px;
+        padding: 20px;
+        margin-top: 20px;
+      }
+
+      .exercise-item {
+        background: rgba(38, 198, 218, 0.1);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 15px;
+      }
+
+      .exercise-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+
+      .exercise-name {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--text-primary);
+      }
+
+      .btn-remove {
+        background: var(--error);
+        border: none;
+        color: white;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .btn-remove:hover {
+        background: #d32f2f;
+      }
+
+      .btn-add-exercise {
+        background: var(--accent);
+        border: none;
+        color: var(--bg-primary);
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        margin-top: 10px;
+        transition: all 0.3s ease;
+      }
+
+      .btn-add-exercise:hover {
+        background: var(--accent-hover);
+      }
+
+      /* Selected Exercises Summary */
+      .selected-summary {
+        background: var(--bg-card);
+        border: 1px solid rgba(38, 198, 218, 0.3);
+        border-radius: 12px;
+        padding: 20px;
+        margin-top: 20px;
+      }
+
+      .summary-day {
+        margin-bottom: 15px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid rgba(38, 198, 218, 0.2);
+      }
+
+      .summary-day:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+      }
+
+      .summary-day-title {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--accent);
+        margin-bottom: 8px;
+      }
+
+      .summary-exercises {
+        font-size: 13px;
+        color: var(--text-secondary);
+        line-height: 1.6;
+      }
+
+      /* Preview Modal */
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 1000;
+        overflow-y: auto;
+      }
+
+      .modal.active {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 40px 20px;
+      }
+
+      .modal-content {
+        background: var(--bg-primary);
+        border: 2px solid var(--accent);
+        border-radius: 16px;
+        padding: 30px;
+        max-width: 700px;
+        width: 100%;
+        max-height: 80vh;
+        overflow-y: auto;
+      }
+
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid rgba(38, 198, 218, 0.3);
+      }
+
+      .modal-title {
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--accent);
+      }
+
+      .btn-close {
+        background: transparent;
+        border: none;
+        color: var(--accent);
+        font-size: 28px;
+        font-weight: 600;
+        cursor: pointer;
+        line-height: 1;
+      }
+
+      .preview-section {
+        margin-bottom: 25px;
+      }
+
+      .preview-label {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-secondary);
+        margin-bottom: 8px;
+      }
+
+      .preview-value {
+        font-size: 16px;
+        color: var(--text-primary);
+        line-height: 1.6;
+      }
+
+      .preview-day {
+        background: var(--bg-secondary);
+        border: 1px solid rgba(38, 198, 218, 0.3);
+        border-radius: 12px;
+        padding: 15px;
+        margin-bottom: 15px;
+      }
+
+      .preview-day-header {
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--accent);
+        margin-bottom: 10px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid rgba(38, 198, 218, 0.2);
+      }
+
+      .preview-muscle-group {
+        margin-bottom: 12px;
+      }
+
+      .preview-muscle-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 5px;
+      }
+
+      .preview-exercises-list {
+        padding-left: 20px;
+        font-size: 13px;
+        color: var(--text-secondary);
+        line-height: 1.8;
+      }
+
+      /* Action Buttons */
+      .form-actions {
+        display: flex;
+        gap: 15px;
+        margin-top: 30px;
+      }
+
+      .btn-secondary {
+        flex: 1;
+        background: transparent;
+        border: 2px solid var(--accent);
+        color: var(--accent);
+        padding: 14px;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .btn-secondary:hover {
+        background: rgba(38, 198, 218, 0.1);
+      }
+
+      .btn-primary {
+        flex: 1;
+        background: var(--accent);
+        border: none;
+        color: var(--bg-primary);
+        padding: 14px;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 8px rgba(38, 198, 218, 0.4);
+      }
+
+      .btn-primary:hover {
+        background: var(--accent-hover);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(38, 198, 218, 0.5);
+      }
+
+      /* Published Workouts List */
+      .workouts-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+      }
+
+      .workout-card {
+        background: var(--bg-secondary);
+        border: 1px solid rgba(38, 198, 218, 0.3);
+        border-radius: 16px;
+        padding: 20px;
+        transition: all 0.3s ease;
+      }
+
+      .workout-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 16px rgba(38, 198, 218, 0.3);
+      }
+
+      .workout-card-header {
+        margin-bottom: 15px;
+      }
+
+      .workout-card-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 5px;
+      }
+
+      .workout-card-meta {
+        font-size: 13px;
+        color: var(--text-secondary);
+      }
+
+      .workout-card-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+      }
+
+      .btn-small {
+        flex: 1;
+        padding: 8px 12px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .btn-edit {
+        background: var(--accent);
+        border: none;
+        color: var(--bg-primary);
+      }
+
+      .btn-delete {
+        background: var(--error);
+        border: none;
+        color: white;
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: var(--text-secondary);
+      }
+
+      .empty-state-icon {
+        font-size: 64px;
+        margin-bottom: 20px;
+      }
+
+      .empty-state-title {
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 10px;
+        color: var(--text-primary);
+      }
+
+      .empty-state-text {
+        font-size: 14px;
+      }
+
+      /* Loading Spinner */
+      .spinner {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: #fff;
+        animation: spin 0.8s linear infinite;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Toast Notifications */
+      .toast {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        background: var(--bg-secondary);
+        border: 2px solid var(--accent);
+        border-radius: 12px;
+        padding: 16px 20px;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        z-index: 2000;
+        display: none;
+        align-items: center;
+        gap: 12px;
+        min-width: 300px;
+        animation: slideIn 0.3s ease;
+      }
+
+      .toast.active {
+        display: flex;
+      }
+
+      .toast.success {
+        border-color: var(--success);
+      }
+
+      .toast.error {
+        border-color: var(--error);
+      }
+
+      .toast-icon {
+        font-size: 24px;
+      }
+
+      .toast-message {
+        flex: 1;
+        font-size: 14px;
+        color: var(--text-primary);
+      }
+
+      @keyframes slideIn {
+        from {
+          transform: translateX(400px);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Login Screen -->
+    <div class="login-container" id="loginScreen">
+      <div class="login-box">
+        <h1 class="login-title">🏋️ RAFE Dashboard</h1>
+        <p class="login-subtitle">Expert Workout Management</p>
+
+        <form id="loginForm" onsubmit="handleLogin(event)">
+          <div class="form-group">
+            <label class="form-label" for="email">Email</label>
+            <input
+              type="email"
+              id="email"
+              class="form-input"
+              placeholder="Enter your email"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="password">Password</label>
+            <input
+              type="password"
+              id="password"
+              class="form-input"
+              placeholder="Enter password"
+              required
+            />
+            <div
+              id="loginError"
+              class="error-message"
+              style="display: none"
+            ></div>
+          </div>
+
+          <button type="submit" class="btn">
+            <span id="loginBtnText">Login</span>
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Main Dashboard -->
+    <div class="dashboard" id="dashboard">
+      <div class="header">
+        <h1 class="header-title">🏋️ RAFE Dashboard</h1>
+        <div class="header-user">
+          <span class="user-email" id="userEmail"></span>
+          <button class="btn-logout" onclick="handleLogout()">Logout</button>
+        </div>
+      </div>
+
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('create')">
+          ➕ Create Workout
+        </button>
+        <button class="tab" onclick="switchTab('published')">
+          📋 Published Workouts
+        </button>
+      </div>
+
+      <!-- Create Workout Tab -->
+      <div class="tab-content active" id="createTab">
+        <form
+          class="workout-form"
+          id="workoutForm"
+          onsubmit="handleSubmit(event)"
+        >
+          <!-- Basic Info -->
+          <div class="section">
+            <h2 class="section-title">📋 Basic Information</h2>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Workout Title *</label>
+                <input
+                  type="text"
+                  class="form-input"
+                  id="workoutTitle"
+                  placeholder="e.g., Push/Pull/Legs Split"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Days Per Week *</label>
+                <input
+                  type="number"
+                  class="form-input"
+                  id="daysPerWeek"
+                  min="1"
+                  max="7"
+                  value="3"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Description *</label>
+              <textarea
+                class="form-input"
+                id="workoutDescription"
+                placeholder="Describe the workout program..."
+                required
+              ></textarea>
+            </div>
+          </div>
+
+          <!-- Training Structure -->
+          <div class="section">
+            <h2 class="section-title">💪 Training Structure</h2>
+
+            <div class="form-group">
+              <label class="form-label">Select Day:</label>
+              <div class="days-selector" id="daysSelector"></div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Select Muscle Groups:</label>
+              <div class="muscle-groups-grid" id="muscleGroupsGrid"></div>
+            </div>
+
+            <div
+              class="exercises-section"
+              id="exercisesSection"
+              style="display: none"
+            >
+              <h3 style="color: var(--accent); margin-bottom: 15px">
+                Exercises
+              </h3>
+              <div id="exercisesList"></div>
+            </div>
+          </div>
+
+          <!-- Selected Structure Summary -->
+          <div class="section">
+            <h2 class="section-title">📊 Structure Summary</h2>
+            <div class="selected-summary" id="structureSummary">
+              <p style="color: var(--text-secondary); text-align: center">
+                No exercises selected yet
+              </p>
+            </div>
+          </div>
+
+          <!-- Form Actions -->
+          <div class="form-actions">
+            <button type="button" class="btn-secondary" onclick="resetForm()">
+              Reset
+            </button>
+            <button type="button" class="btn-secondary" onclick="openPreview()">
+              👁️ Preview
+            </button>
+            <button type="button" class="btn-secondary" onclick="saveDraft()">
+              💾 Save Draft
+            </button>
+            <button type="submit" class="btn-primary">
+              🚀 Publish Workout
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Published Workouts Tab -->
+      <div class="tab-content" id="publishedTab">
+        <div class="workouts-grid" id="workoutsGrid">
+          <div class="empty-state">
+            <div class="empty-state-icon">📦</div>
+            <h3 class="empty-state-title">No published workouts yet</h3>
+            <p class="empty-state-text">
+              Create your first expert workout to get started!
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Preview Modal -->
+    <div class="modal" id="previewModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title">📋 Workout Preview</h2>
+          <button class="btn-close" onclick="closePreview()">&times;</button>
+        </div>
+        <div id="previewContent"></div>
+        <div class="form-actions" style="margin-top: 30px">
+          <button class="btn-secondary" onclick="closePreview()">Close</button>
+          <button class="btn-primary" onclick="publishFromPreview()">
+            🚀 Publish
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+      <span class="toast-icon" id="toastIcon"></span>
+      <span class="toast-message" id="toastMessage"></span>
+    </div>
+
+    <script type="module">
+      // Firebase Configuration
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+      import {
+        getAuth,
+        signInWithEmailAndPassword,
+        signOut,
+        onAuthStateChanged,
+      } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+      import {
+        getFirestore,
+        collection,
+        addDoc,
+        getDocs,
+        doc,
+        updateDoc,
+        deleteDoc,
+        serverTimestamp,
+        query,
+        where,
+        orderBy,
+      } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+      // TODO: Replace with your actual Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyCiAbF7btthzFliNu2DZMtmo6RW5VWv92c",
+        authDomain: "rafefit.firebaseapp.com",
+        projectId: "rafefit",
+        storageBucket: "rafefit.appspot.com",
+        messagingSenderId: "521794785027",
+        appId: "1:521794785027:web:35c0b8ae23b38a029d6336",
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const db = getFirestore(app);
+
+      // Global state
+      window.currentUser = null;
+      window.currentDay = 1;
+      window.selectedMuscleGroup = null;
+      window.workoutStructure = {};
+      window.currentEditId = null;
+
+      const ALLOWED_EMAIL = "rafay35business@gmail.com";
+      const MUSCLE_GROUPS = [
+        "Chest",
+        "Back",
+        "Shoulders",
+        "Biceps",
+        "Triceps",
+        "Forearms",
+        "Legs",
+        "Glutes",
+        "Quads",
+        "Hamstrings",
+        "Calves",
+        "Core",
+      ];
+
+      // Predefined exercises by muscle group
+      const EXERCISES_BY_MUSCLE = {
+        Chest: [
+          "Bench Press",
+          "Incline Dumbbell Press",
+          "Chest Flyes",
+          "Push-ups",
+          "Cable Crossovers",
+        ],
+        Back: [
+          "Deadlift",
+          "Pull-ups",
+          "Barbell Rows",
+          "Lat Pulldowns",
+          "Cable Rows",
+          "T-Bar Rows",
+        ],
+        Shoulders: [
+          "Overhead Press",
+          "Lateral Raises",
+          "Rear Delt Flyes",
+          "Front Raises",
+          "Arnold Press",
+        ],
+        Biceps: [
+          "Bicep Curls",
+          "Hammer Curls",
+          "Concentration Curls",
+          "Cable Curls",
+        ],
+        Triceps: [
+          "Tricep Dips",
+          "Tricep Extensions",
+          "Close Grip Bench Press",
+          "Skull Crushers",
+        ],
+        Forearms: ["Wrist Curls", "Reverse Wrist Curls", "Farmers Walk"],
+        Legs: [
+          "Squats",
+          "Leg Press",
+          "Leg Curls",
+          "Leg Extensions",
+          "Calf Raises",
+        ],
+        Glutes: [
+          "Hip Thrusts",
+          "Bulgarian Split Squats",
+          "Glute Bridges",
+          "Sumo Squats",
+        ],
+        Quads: ["Front Squats", "Leg Extensions", "Lunges", "Hack Squats"],
+        Hamstrings: ["Romanian Deadlifts", "Leg Curls", "Good Mornings"],
+        Calves: ["Standing Calf Raises", "Seated Calf Raises", "Calf Press"],
+        Core: [
+          "Planks",
+          "Russian Twists",
+          "Mountain Climbers",
+          "Dead Bugs",
+          "Hanging Leg Raises",
+        ],
+      };
+
+      // Auth State Observer
+      onAuthStateChanged(auth, (user) => {
+        if (user && user.email === ALLOWED_EMAIL) {
+          window.currentUser = user;
+          document.getElementById("loginScreen").style.display = "none";
+          document.getElementById("dashboard").classList.add("active");
+          document.getElementById("userEmail").textContent = user.email;
+          initializeDashboard();
+          loadPublishedWorkouts();
+        } else {
+          if (user) signOut(auth); // Sign out unauthorized users
+          document.getElementById("loginScreen").style.display = "flex";
+          document.getElementById("dashboard").classList.remove("active");
+        }
+      });
+
+      // Login Handler
+      window.handleLogin = async (event) => {
+        event.preventDefault();
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+        const errorEl = document.getElementById("loginError");
+        const btnText = document.getElementById("loginBtnText");
+
+        if (email !== ALLOWED_EMAIL) {
+          errorEl.textContent =
+            "Access denied. Only Rafay can access this dashboard.";
+          errorEl.style.display = "block";
+          document.getElementById("email").classList.add("error");
+          return;
+        }
+
+        try {
+          btnText.innerHTML = '<span class="spinner"></span>';
+          await signInWithEmailAndPassword(auth, email, password);
+          errorEl.style.display = "none";
+        } catch (error) {
+          errorEl.textContent = "Invalid credentials. Please try again.";
+          errorEl.style.display = "block";
+          document.getElementById("password").classList.add("error");
+          btnText.textContent = "Login";
+        }
+      };
+
+      // Logout Handler
+      window.handleLogout = async () => {
+        if (confirm("Are you sure you want to logout?")) {
+          await signOut(auth);
+          showToast("Logged out successfully", "success");
+        }
+      };
+
+      // Initialize Dashboard
+      function initializeDashboard() {
+        const daysPerWeek =
+          parseInt(document.getElementById("daysPerWeek").value) || 3;
+        renderDaysSelector(daysPerWeek);
+        renderMuscleGroups();
+
+        // Initialize structure
+        window.workoutStructure = {};
+        for (let i = 1; i <= daysPerWeek; i++) {
+          window.workoutStructure[`day${i}`] = [];
+        }
+
+        // Days per week change handler
+        document
+          .getElementById("daysPerWeek")
+          .addEventListener("change", (e) => {
+            const newDays = parseInt(e.target.value);
+            renderDaysSelector(newDays);
+
+            // Reset structure for new day count
+            const oldStructure = { ...window.workoutStructure };
+            window.workoutStructure = {};
+            for (let i = 1; i <= newDays; i++) {
+              window.workoutStructure[`day${i}`] =
+                oldStructure[`day${i}`] || [];
+            }
+            updateStructureSummary();
+          });
+      }
+
+      // Render Days Selector
+      function renderDaysSelector(daysCount) {
+        const container = document.getElementById("daysSelector");
+        container.innerHTML = "";
+
+        for (let i = 1; i <= daysCount; i++) {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = `day-btn ${i === window.currentDay ? "active" : ""}`;
+          btn.textContent = `Day ${i}`;
+          btn.onclick = () => selectDay(i);
+          container.appendChild(btn);
+        }
+      }
+
+      // Select Day
+      window.selectDay = (day) => {
+        window.currentDay = day;
+        window.selectedMuscleGroup = null;
+
+        // Update UI
+        document
+          .querySelectorAll(".day-btn")
+          .forEach((btn) => btn.classList.remove("active"));
+        event.target.classList.add("active");
+        document
+          .querySelectorAll(".muscle-btn")
+          .forEach((btn) => btn.classList.remove("active"));
+        document.getElementById("exercisesSection").style.display = "none";
+      };
+
+      // Render Muscle Groups
+      function renderMuscleGroups() {
+        const container = document.getElementById("muscleGroupsGrid");
+        container.innerHTML = "";
+
+        MUSCLE_GROUPS.forEach((muscle) => {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "muscle-btn";
+          btn.textContent = muscle;
+          btn.onclick = () => selectMuscleGroup(muscle, btn);
+          container.appendChild(btn);
+        });
+      }
+
+      // Select Muscle Group
+      window.selectMuscleGroup = (muscle, btnElement) => {
+        window.selectedMuscleGroup = muscle;
+
+        // Update UI
+        document
+          .querySelectorAll(".muscle-btn")
+          .forEach((btn) => btn.classList.remove("active"));
+        btnElement.classList.add("active");
+
+        renderExercises(muscle);
+        document.getElementById("exercisesSection").style.display = "block";
+      };
+
+      // Render Exercises
+      function renderExercises(muscle) {
+        const container = document.getElementById("exercisesList");
+        const exercises = EXERCISES_BY_MUSCLE[muscle] || [];
+        const dayKey = `day${window.currentDay}`;
+        const selectedExercises = window.workoutStructure[dayKey] || [];
+
+        container.innerHTML = "";
+
+        exercises.forEach((exercise) => {
+          const isSelected = selectedExercises.some(
+            (ex) => ex.exerciseName === exercise && ex.muscleGroup === muscle
+          );
+
+          const div = document.createElement("div");
+          div.className = "exercise-item";
+          div.style.background = isSelected ? "rgba(76,175,80,0.2)" : "";
+          div.style.borderColor = isSelected ? "#4caf50" : "";
+
+          div.innerHTML = `
+                    <div class="exercise-header">
+                        <span class="exercise-name">${exercise}</span>
+                        <button 
+                            type="button" 
+                            class="btn-${
+                              isSelected ? "remove" : "add-exercise"
+                            }"
+                            onclick="toggleExercise('${exercise}', '${muscle}')"
+                        >
+                            ${isSelected ? "✓ Selected" : "+ Add"}
+                        </button>
+                    </div>
+                `;
+
+          container.appendChild(div);
+        });
+
+        // Add custom exercise button
+        const addCustomBtn = document.createElement("button");
+        addCustomBtn.type = "button";
+        addCustomBtn.className = "btn-add-exercise";
+        addCustomBtn.textContent = "+ Add Custom Exercise";
+        addCustomBtn.onclick = () => addCustomExercise(muscle);
+        container.appendChild(addCustomBtn);
+      }
+
+      // Toggle Exercise
+      window.toggleExercise = (exerciseName, muscleGroup) => {
+        const dayKey = `day${window.currentDay}`;
+        const exercises = window.workoutStructure[dayKey] || [];
+
+        const index = exercises.findIndex(
+          (ex) =>
+            ex.exerciseName === exerciseName && ex.muscleGroup === muscleGroup
+        );
+
+        if (index > -1) {
+          exercises.splice(index, 1);
+        } else {
+          exercises.push({ exerciseName, muscleGroup });
+        }
+
+        window.workoutStructure[dayKey] = exercises;
+        renderExercises(muscleGroup);
+        updateStructureSummary();
+      };
+
+      // Add Custom Exercise
+      window.addCustomExercise = (muscleGroup) => {
+        const exerciseName = prompt("Enter custom exercise name:");
+        if (exerciseName && exerciseName.trim()) {
+          // Add to exercises list
+          if (!EXERCISES_BY_MUSCLE[muscleGroup].includes(exerciseName.trim())) {
+            EXERCISES_BY_MUSCLE[muscleGroup].push(exerciseName.trim());
+          }
+
+          // Add to current day
+          const dayKey = `day${window.currentDay}`;
+          window.workoutStructure[dayKey].push({
+            exerciseName: exerciseName.trim(),
+            muscleGroup,
+          });
+
+          renderExercises(muscleGroup);
+          updateStructureSummary();
+        }
+      };
+
+      // Update Structure Summary
+      function updateStructureSummary() {
+        const container = document.getElementById("structureSummary");
+        const daysPerWeek = parseInt(
+          document.getElementById("daysPerWeek").value
+        );
+
+        let hasExercises = false;
+        let html = "";
+
+        for (let i = 1; i <= daysPerWeek; i++) {
+          const dayKey = `day${i}`;
+          const exercises = window.workoutStructure[dayKey] || [];
+
+          if (exercises.length > 0) {
+            hasExercises = true;
+            html += `
+                        <div class="summary-day">
+                            <div class="summary-day-title">📌 Day ${i}</div>
+                            <div class="summary-exercises">
+                                ${exercises
+                                  .map(
+                                    (ex) =>
+                                      `• ${ex.exerciseName} (${ex.muscleGroup})`
+                                  )
+                                  .join("<br>")}
+                            </div>
+                        </div>
+                    `;
+          } else {
+            html += `
+                        <div class="summary-day">
+                            <div class="summary-day-title">📌 Day ${i}</div>
+                            <div class="summary-exercises" style="color: var(--error);">No exercises selected</div>
+                        </div>
+                    `;
+          }
+        }
+
+        container.innerHTML = hasExercises
+          ? html
+          : '<p style="color: var(--text-secondary); text-align: center;">No exercises selected yet</p>';
+      }
+
+      // Open Preview
+      window.openPreview = () => {
+        const title = document.getElementById("workoutTitle").value;
+        const description = document.getElementById("workoutDescription").value;
+        const daysPerWeek = parseInt(
+          document.getElementById("daysPerWeek").value
+        );
+
+        if (!title || !description) {
+          showToast("Please fill in title and description", "error");
+          return;
+        }
+
+        // Check if all days have exercises
+        let allDaysHaveExercises = true;
+        for (let i = 1; i <= daysPerWeek; i++) {
+          if ((window.workoutStructure[`day${i}`] || []).length === 0) {
+            allDaysHaveExercises = false;
+            break;
+          }
+        }
+
+        if (!allDaysHaveExercises) {
+          showToast("Please add exercises for all training days", "error");
+          return;
+        }
+
+        // Generate preview
+        let previewHTML = `
+                <div class="preview-section">
+                    <div class="preview-label">Workout Title</div>
+                    <div class="preview-value">${title}</div>
+                </div>
+                <div class="preview-section">
+                    <div class="preview-label">Description</div>
+                    <div class="preview-value">${description}</div>
+                </div>
+                <div class="preview-section">
+                    <div class="preview-label">Training Days</div>
+                    <div class="preview-value">${daysPerWeek} days/week</div>
+                </div>
+                <div class="preview-section">
+                    <div class="preview-label">Training Structure</div>
+            `;
+
+        for (let i = 1; i <= daysPerWeek; i++) {
+          const dayKey = `day${i}`;
+          const exercises = window.workoutStructure[dayKey] || [];
+
+          // Group by muscle
+          const byMuscle = {};
+          exercises.forEach((ex) => {
+            if (!byMuscle[ex.muscleGroup]) byMuscle[ex.muscleGroup] = [];
+            byMuscle[ex.muscleGroup].push(ex.exerciseName);
+          });
+
+          previewHTML += `
+                    <div class="preview-day">
+                        <div class="preview-day-header">📅 Day ${i}</div>
+                `;
+
+          Object.keys(byMuscle).forEach((muscle) => {
+            previewHTML += `
+                        <div class="preview-muscle-group">
+                            <div class="preview-muscle-title">💪 ${muscle}</div>
+                            <div class="preview-exercises-list">
+                                ${byMuscle[muscle]
+                                  .map((ex, idx) => `${idx + 1}. ${ex}`)
+                                  .join("<br>")}
+                            </div>
+                        </div>
+                    `;
+          });
+
+          previewHTML += `</div>`;
+        }
+
+        previewHTML += `</div>`;
+
+        document.getElementById("previewContent").innerHTML = previewHTML;
+        document.getElementById("previewModal").classList.add("active");
+      };
+
+      // Close Preview
+      window.closePreview = () => {
+        document.getElementById("previewModal").classList.remove("active");
+      };
+
+      // Publish from Preview
+      window.publishFromPreview = () => {
+        closePreview();
+        handleSubmit(new Event("submit"));
+      };
+
+      // Save Draft
+      window.saveDraft = () => {
+        const title = document.getElementById("workoutTitle").value;
+        if (!title) {
+          showToast("Please enter a title first", "error");
+          return;
+        }
+
+        const draft = {
+          title,
+          description: document.getElementById("workoutDescription").value,
+          daysPerWeek: parseInt(document.getElementById("daysPerWeek").value),
+          structure: window.workoutStructure,
+        };
+
+        localStorage.setItem("rafeDraft", JSON.stringify(draft));
+        showToast("Draft saved successfully", "success");
+      };
+
+      // Load Draft
+      function loadDraft() {
+        const draft = localStorage.getItem("rafeDraft");
+        if (draft) {
+          const data = JSON.parse(draft);
+          document.getElementById("workoutTitle").value = data.title || "";
+          document.getElementById("workoutDescription").value =
+            data.description || "";
+          document.getElementById("daysPerWeek").value = data.daysPerWeek || 3;
+          window.workoutStructure = data.structure || {};
+          initializeDashboard();
+          updateStructureSummary();
+          showToast("Draft loaded", "success");
+        }
+      }
+
+      // Check for draft on load
+      setTimeout(() => {
+        const draft = localStorage.getItem("rafeDraft");
+        if (draft && window.currentUser) {
+          if (confirm("You have a saved draft. Would you like to load it?")) {
+            loadDraft();
+          }
+        }
+      }, 1000);
+
+      // Submit Handler
+      window.handleSubmit = async (event) => {
+        event.preventDefault();
+
+        const title = document.getElementById("workoutTitle").value;
+        const description = document.getElementById("workoutDescription").value;
+        const daysPerWeek = parseInt(
+          document.getElementById("daysPerWeek").value
+        );
+
+        // Validate
+        if (!title || !description) {
+          showToast("Please fill in all required fields", "error");
+          return;
+        }
+
+        // Check if all days have exercises
+        for (let i = 1; i <= daysPerWeek; i++) {
+          if ((window.workoutStructure[`day${i}`] || []).length === 0) {
+            showToast(
+              `Day ${i} has no exercises. Please add at least one exercise per day.`,
+              "error"
+            );
+            return;
+          }
+        }
+
+        // Transform structure to match app format
+        const transformedStructure = {};
+        Object.keys(window.workoutStructure).forEach((dayKey) => {
+          const exercises = window.workoutStructure[dayKey];
+          const byMuscle = {};
+
+          exercises.forEach((ex) => {
+            if (!byMuscle[ex.muscleGroup]) byMuscle[ex.muscleGroup] = [];
+            byMuscle[ex.muscleGroup].push(ex.exerciseName);
+          });
+
+          transformedStructure[dayKey] = Object.keys(byMuscle).map(
+            (muscle) => ({
+              muscleGroup: muscle,
+              exercises: byMuscle[muscle],
+            })
+          );
+        });
+
+        const workoutData = {
+          name: title,
+          description,
+          daysPerWeek,
+          totalWeeks: 7,
+          structure: transformedStructure,
+          isExpert: true,
+          createdBy: "Rafe Martinez",
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+          published: true,
+        };
+
+        try {
+          if (window.currentEditId) {
+            // Update existing
+            await updateDoc(doc(db, "rafe_workouts", window.currentEditId), {
+              ...workoutData,
+              updatedAt: serverTimestamp(),
+            });
+            showToast("Workout updated successfully!", "success");
+            window.currentEditId = null;
+          } else {
+            // Create new
+            await addDoc(collection(db, "rafe_workouts"), workoutData);
+            showToast("Workout published successfully!", "success");
+          }
+
+          // Clear form and draft
+          resetForm();
+          localStorage.removeItem("rafeDraft");
+
+          // Switch to published tab
+          setTimeout(() => {
+            switchTab("published");
+            loadPublishedWorkouts();
+          }, 1500);
+        } catch (error) {
+          console.error("Error publishing workout:", error);
+          showToast("Failed to publish workout. Please try again.", "error");
+        }
+      };
+
+      // Reset Form
+      window.resetForm = () => {
+        if (confirm("Are you sure? This will clear all entered data.")) {
+          document.getElementById("workoutForm").reset();
+          window.workoutStructure = {};
+          window.currentEditId = null;
+          window.currentDay = 1;
+          window.selectedMuscleGroup = null;
+          initializeDashboard();
+          updateStructureSummary();
+          document.getElementById("exercisesSection").style.display = "none";
+        }
+      };
+
+      // Switch Tab
+      window.switchTab = (tabName) => {
+        document
+          .querySelectorAll(".tab")
+          .forEach((tab) => tab.classList.remove("active"));
+        document
+          .querySelectorAll(".tab-content")
+          .forEach((content) => content.classList.remove("active"));
+
+        event.target.classList.add("active");
+        document.getElementById(`${tabName}Tab`).classList.add("active");
+
+        if (tabName === "published") {
+          loadPublishedWorkouts();
+        }
+      };
+
+      // Load Published Workouts
+      async function loadPublishedWorkouts() {
+        const container = document.getElementById("workoutsGrid");
+        container.innerHTML =
+          '<p style="text-align:center; color: var(--text-secondary);">Loading...</p>';
+
+        try {
+          const q = query(
+            collection(db, "rafe_workouts"),
+            orderBy("createdAt", "desc")
+          );
+          const snapshot = await getDocs(q);
+
+          if (snapshot.empty) {
+            container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📦</div>
+                            <h3 class="empty-state-title">No published workouts yet</h3>
+                            <p class="empty-state-text">Create your first expert workout to get started!</p>
+                        </div>
+                    `;
+            return;
+          }
+
+          container.innerHTML = "";
+          snapshot.forEach((doc) => {
+            const workout = doc.data();
+            const card = createWorkoutCard(doc.id, workout);
+            container.appendChild(card);
+          });
+        } catch (error) {
+          console.error("Error loading workouts:", error);
+          container.innerHTML =
+            '<p style="text-align:center; color: var(--error);">Failed to load workouts</p>';
+        }
+      }
+
+      // Create Workout Card
+      function createWorkoutCard(id, workout) {
+        const card = document.createElement("div");
+        card.className = "workout-card";
+
+        const createdDate = workout.createdAt?.toDate
+          ? workout.createdAt.toDate().toLocaleDateString()
+          : "Recently";
+
+        card.innerHTML = `
+                <div class="workout-card-header">
+                    <h3 class="workout-card-title">${workout.name}</h3>
+                    <p class="workout-card-meta">${
+                      workout.daysPerWeek
+                    } days/week • Created ${createdDate}</p>
+                </div>
+                <p style="font-size: 14px; color: var(--text-secondary); margin-top: 10px;">
+                    ${workout.description.substring(0, 100)}${
+          workout.description.length > 100 ? "..." : ""
+        }
+                </p>
+                <div class="workout-card-actions">
+                    <button class="btn-small btn-edit" onclick="editWorkout('${id}')">✏️ Edit</button>
+                    <button class="btn-small btn-delete" onclick="deleteWorkout('${id}', '${
+          workout.name
+        }')">🗑️ Delete</button>
+                </div>
+            `;
+
+        return card;
+      }
+
+      // Edit Workout
+      window.editWorkout = async (id) => {
+        try {
+          const docSnap = await doc(db, "rafe_workouts", id);
+          const workout = (await getDoc(docSnap)).data();
+
+          // Load data into form
+          document.getElementById("workoutTitle").value = workout.name;
+          document.getElementById("workoutDescription").value =
+            workout.description;
+          document.getElementById("daysPerWeek").value = workout.daysPerWeek;
+
+          // Convert structure back to editable format
+          window.workoutStructure = {};
+          Object.keys(workout.structure).forEach((dayKey) => {
+            window.workoutStructure[dayKey] = [];
+            workout.structure[dayKey].forEach((muscleGroup) => {
+              muscleGroup.exercises.forEach((exerciseName) => {
+                window.workoutStructure[dayKey].push({
+                  exerciseName,
+                  muscleGroup: muscleGroup.muscleGroup,
+                });
+              });
+            });
+          });
+
+          window.currentEditId = id;
+          initializeDashboard();
+          updateStructureSummary();
+          switchTab("create");
+
+          showToast("Workout loaded for editing", "success");
+        } catch (error) {
+          console.error("Error loading workout:", error);
+          showToast("Failed to load workout", "error");
+        }
+      };
+
+      // Delete Workout
+      window.deleteWorkout = async (id, name) => {
+        if (
+          !confirm(
+            `Are you sure you want to delete "${name}"? This action cannot be undone.`
+          )
+        ) {
+          return;
+        }
+
+        try {
+          await deleteDoc(doc(db, "rafe_workouts", id));
+          showToast("Workout deleted successfully", "success");
+          loadPublishedWorkouts();
+        } catch (error) {
+          console.error("Error deleting workout:", error);
+          showToast("Failed to delete workout", "error");
+        }
+      };
+
+      // Show Toast
+      function showToast(message, type = "success") {
+        const toast = document.getElementById("toast");
+        const icon = document.getElementById("toastIcon");
+        const msg = document.getElementById("toastMessage");
+
+        icon.textContent = type === "success" ? "✅" : "❌";
+        msg.textContent = message;
+
+        toast.className = `toast ${type} active`;
+
+        setTimeout(() => {
+          toast.classList.remove("active");
+        }, 3000);
+      }
+
+      window.showToast = showToast;
+    </script>
+  </body>
+</html>
