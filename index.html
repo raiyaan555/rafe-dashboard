@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>RAFE Dashboard - Expert Workouts</title>
+    <title>Expert Workout Dashboard</title>
     <style>
       * {
         margin: 0;
@@ -730,7 +730,7 @@
     <!-- Login Screen -->
     <div class="login-container" id="loginScreen">
       <div class="login-box">
-        <h1 class="login-title">🏋️ RAFE Dashboard</h1>
+        <h1 class="login-title">🏋️ Expert Workout Dashboard</h1>
         <p class="login-subtitle">Expert Workout Management</p>
 
         <form id="loginForm" onsubmit="handleLogin(event)">
@@ -771,7 +771,7 @@
     <!-- Main Dashboard -->
     <div class="dashboard" id="dashboard">
       <div class="header">
-        <h1 class="header-title">🏋️ RAFE Dashboard</h1>
+        <h1 class="header-title">🏋️ Expert Workout Dashboard</h1>
         <div class="header-user">
           <span class="user-email" id="userEmail"></span>
           <button class="btn-logout" onclick="handleLogout()">Logout</button>
@@ -779,10 +779,10 @@
       </div>
 
       <div class="tabs">
-        <button class="tab active" onclick="switchTab('create')">
+        <button class="tab active" onclick="switchTab('create', event)">
           ➕ Create Workout
         </button>
-        <button class="tab" onclick="switchTab('published')">
+        <button class="tab" onclick="switchTab('published', event)">
           📋 Published Workouts
         </button>
       </div>
@@ -821,6 +821,15 @@
                   value="3"
                   required
                 />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Program Duration *</label>
+                <select id="programDuration" class="form-input">
+                  <option value="5">5 Weeks</option>
+                  <option value="7" selected>7 Weeks</option>
+                  <option value="9">9 Weeks</option>
+                </select>
               </div>
             </div>
 
@@ -940,6 +949,7 @@
         collection,
         addDoc,
         getDocs,
+        getDoc,
         doc,
         updateDoc,
         deleteDoc,
@@ -1365,6 +1375,12 @@
                     <div class="preview-value">${daysPerWeek} days/week</div>
                 </div>
                 <div class="preview-section">
+                    <div class="preview-label">Program Duration</div>
+                    <div class="preview-value">${
+                      document.getElementById("programDuration").value
+                    } weeks</div>
+                </div>
+                <div class="preview-section">
                     <div class="preview-label">Training Structure</div>
             `;
 
@@ -1429,6 +1445,9 @@
           title,
           description: document.getElementById("workoutDescription").value,
           daysPerWeek: parseInt(document.getElementById("daysPerWeek").value),
+          totalWeeks: parseInt(
+            document.getElementById("programDuration").value
+          ),
           structure: window.workoutStructure,
         };
 
@@ -1445,6 +1464,8 @@
           document.getElementById("workoutDescription").value =
             data.description || "";
           document.getElementById("daysPerWeek").value = data.daysPerWeek || 3;
+          const durEl = document.getElementById("programDuration");
+          if (durEl && data.totalWeeks) durEl.value = String(data.totalWeeks);
           window.workoutStructure = data.structure || {};
           initializeDashboard();
           updateStructureSummary();
@@ -1508,31 +1529,37 @@
           );
         });
 
+        const totalWeeks = parseInt(
+          document.getElementById("programDuration").value
+        );
+
         const workoutData = {
           name: title,
           description,
           daysPerWeek,
-          totalWeeks: 7,
+          totalWeeks,
           structure: transformedStructure,
           isExpert: true,
-          createdBy: "Rafe Martinez",
-          createdAt: serverTimestamp(),
-          updatedAt: serverTimestamp(),
+          createdBy: "Expert Coach",
           published: true,
+          updatedAt: serverTimestamp(),
         };
 
         try {
           if (window.currentEditId) {
-            // Update existing
-            await updateDoc(doc(db, "rafe_workouts", window.currentEditId), {
-              ...workoutData,
-              updatedAt: serverTimestamp(),
-            });
+            // Update existing (don't overwrite createdAt)
+            await updateDoc(
+              doc(db, "rafe_workouts", window.currentEditId),
+              workoutData
+            );
             showToast("Workout updated successfully!", "success");
             window.currentEditId = null;
           } else {
             // Create new
-            await addDoc(collection(db, "rafe_workouts"), workoutData);
+            await addDoc(collection(db, "rafe_workouts"), {
+              ...workoutData,
+              createdAt: serverTimestamp(),
+            });
             showToast("Workout published successfully!", "success");
           }
 
@@ -1566,7 +1593,7 @@
       };
 
       // Switch Tab
-      window.switchTab = (tabName) => {
+      window.switchTab = (tabName, evt) => {
         document
           .querySelectorAll(".tab")
           .forEach((tab) => tab.classList.remove("active"));
@@ -1574,7 +1601,10 @@
           .querySelectorAll(".tab-content")
           .forEach((content) => content.classList.remove("active"));
 
-        event.target.classList.add("active");
+        const tabBtn =
+          evt?.target ||
+          document.querySelector(`[onclick*="switchTab('${tabName}')"]`);
+        if (tabBtn) tabBtn.classList.add("active");
         document.getElementById(`${tabName}Tab`).classList.add("active");
 
         if (tabName === "published") {
@@ -1633,7 +1663,7 @@
                     <h3 class="workout-card-title">${workout.name}</h3>
                     <p class="workout-card-meta">${
                       workout.daysPerWeek
-                    } days/week • Created ${createdDate}</p>
+                    } days/week • ${workout.totalWeeks || 7} weeks • Created ${createdDate}</p>
                 </div>
                 <p style="font-size: 14px; color: var(--text-secondary); margin-top: 10px;">
                     ${workout.description.substring(0, 100)}${
@@ -1654,14 +1684,23 @@
       // Edit Workout
       window.editWorkout = async (id) => {
         try {
-          const docSnap = await doc(db, "rafe_workouts", id);
-          const workout = (await getDoc(docSnap)).data();
+          const docRef = doc(db, "rafe_workouts", id);
+          const docSnap = await getDoc(docRef);
+          if (!docSnap.exists()) {
+            showToast("Workout not found", "error");
+            return;
+          }
+          const workout = docSnap.data();
 
           // Load data into form
           document.getElementById("workoutTitle").value = workout.name;
           document.getElementById("workoutDescription").value =
             workout.description;
           document.getElementById("daysPerWeek").value = workout.daysPerWeek;
+          const durationEl = document.getElementById("programDuration");
+          if (durationEl && workout.totalWeeks) {
+            durationEl.value = String(workout.totalWeeks);
+          }
 
           // Convert structure back to editable format
           window.workoutStructure = {};
