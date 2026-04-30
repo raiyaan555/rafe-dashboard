@@ -995,8 +995,7 @@
         "Abs",
       ];
 
-      // Predefined exercises by muscle group
-      const EXERCISES_BY_MUSCLE = {
+      const DEFAULT_EXERCISE_CATALOG = {
         Chest: [
           "Machine Chest Press",
           "Barbell Bench Press",
@@ -1018,6 +1017,10 @@
           "Barbell Rows",
           "Dumbbell Rows",
           "Cable Rows",
+          "Lat Pulldowns (Wide Grip)",
+          "Lat Pulldowns (Narrow Grip)",
+          "Pullups (Wide Grip)",
+          "Pullups (Narrow Grip)",
         ],
         Quads: [
           "High Bar Squats",
@@ -1046,6 +1049,8 @@
           "Barbell Curls",
           "Preacher Curls",
           "Cable Curls",
+          "Bayesian Curls",
+          "Incline Curls",
         ],
         Triceps: [
           "Skullcrushers",
@@ -1068,6 +1073,9 @@
           "Front Raises",
           "Rear Delt Flys",
           "Machine Lateral Raises",
+          "Barbell Overhead Press",
+          "Dumbbell Overhead Press",
+          "Machine Overhead Press",
         ],
         Calves: [
           "Seated Calf Raises",
@@ -1075,13 +1083,11 @@
           "Leg Press Calf Raises",
           "Machine Calf Raises",
         ],
-        Abs: [
-          "Crunches",
-          "Hanging Leg Raises",
-          "Sit Ups",
-          "Ab Crunch Machine",
-        ],
+        Abs: ["Crunches", "Hanging Leg Raises", "Sit Ups", "Ab Crunch Machine"],
       };
+
+      // Backwards-compat: existing UI code reads from this name.
+      const EXERCISES_BY_MUSCLE = DEFAULT_EXERCISE_CATALOG;
 
       // Auth State Observer
       onAuthStateChanged(auth, (user) => {
